@@ -1,0 +1,117 @@
+﻿[PyScripter]
+Version=2.5.3.0
+
+[Project]
+ClassName=TProjectRootNode
+StoreRelativePaths=TRUE
+ShowFileExtensions=FALSE
+
+[Project\ChildNodes\Node0]
+ClassName=TProjectFilesNode
+
+[Project\ChildNodes\Node0\ChildNodes\Node0]
+ClassName=TProjectFileNode
+FileName=$[Project-Path]SOURCE\__main__.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node1]
+ClassName=TProjectFileNode
+FileName=$[Project-Path]SOURCE\Package\functions\flowProcess.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node2]
+ClassName=TProjectFileNode
+FileName=$[Project-Path]SOURCE\LnRSync.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node3]
+ClassName=TProjectFileNode
+FileName=$[Project-Path]SOURCE\Package\functions\readConfig.py
+
+[Project\ChildNodes\Node0\ChildNodes\Node4]
+ClassName=TProjectFileNode
+FileName=$[Project-Path]SOURCE\TEST_01.py
+
+[Project\ChildNodes\Node0\ChildNodes]
+Count=5
+
+[Project\ChildNodes\Node1]
+ClassName=TProjectRunConfiguationsNode
+
+[Project\ChildNodes\Node1\ChildNodes\Node0]
+ClassName=TProjectRunConfiguationNode
+Name=run NO Section
+
+[Project\ChildNodes\Node1\ChildNodes\Node0\RunConfig]
+ScriptName=l:\Loreto\ProjectsAppl\_Python\LN_PythonProjects\LnRSync\SOURCE\__main__.py
+Description=Prova
+EngineType=peRemote
+ReinitializeBeforeRun=TRUE
+Parameters=-c HomeBackup.cfg
+WorkingDir=$[ActiveScript-Dir]
+WriteOutputToFile=FALSE
+OutputFileName=$[ActiveScript-NoExt].log
+AppendToFile=FALSE
+
+[Project\ChildNodes\Node1\ChildNodes\Node0\RunConfig\ExternalRun]
+Caption=External Run
+Description=Run script using an external Python Interpreter
+ApplicationName=$[PythonExe-Short]
+Parameters=$[ActiveScript-Short]
+WorkingDirectory=$[ActiveScript-Dir]
+ShortCut=0
+MessagesFormat=$[FileName] $[LineNumber]
+
+[Project\ChildNodes\Node1\ChildNodes\Node1]
+ClassName=TProjectRunConfiguationNode
+Name=run with SectionName
+
+[Project\ChildNodes\Node1\ChildNodes\Node1\RunConfig]
+ScriptName=L:\Loreto\ProjectsAppl\PythonProjects\LnRSync\SOURCE\__main__.py
+EngineType=peRemote
+ReinitializeBeforeRun=TRUE
+Parameters=-c HomeBackup.cfg -a step -s Test_DiscoX
+WorkingDir=$[ActiveScript-Dir]
+WriteOutputToFile=FALSE
+OutputFileName=$[ActiveScript-NoExt].log
+AppendToFile=FALSE
+
+[Project\ChildNodes\Node1\ChildNodes\Node1\RunConfig\ExternalRun]
+Caption=External Run
+Description=Run script using an external Python Interpreter
+ApplicationName=$[PythonExe-Short]
+Parameters=$[ActiveScript-Short]
+WorkingDirectory=$[ActiveScript-Dir]
+ShortCut=0
+MessagesFormat=$[FileName] $[LineNumber]
+
+[Project\ChildNodes\Node1\ChildNodes\Node2]
+ClassName=TProjectRunConfiguationNode
+Name=TEST_01
+
+[Project\ChildNodes\Node1\ChildNodes\Node2\RunConfig]
+ScriptName=L:\Loreto\ProjectsAppl\PythonProjects\LnRSync\SOURCE\TEST_01.py
+Description=Test01
+EngineType=peRemote
+ReinitializeBeforeRun=TRUE
+Parameters=-c HomeBackup.cfg -a step -s Test_DiscoX
+WorkingDir=$[ActiveScript-Dir]
+WriteOutputToFile=FALSE
+OutputFileName=$[ActiveScript-NoExt].log
+AppendToFile=FALSE
+
+[Project\ChildNodes\Node1\ChildNodes\Node2\RunConfig\ExternalRun]
+Caption=External Run
+Description=Run script using an external Python Interpreter
+ApplicationName=$[PythonExe-Short]
+Parameters=$[ActiveScript-Short]
+WorkingDirectory=$[ActiveScript-Dir]
+ShortCut=0
+MessagesFormat=$[FileName] $[LineNumber]
+
+[Project\ChildNodes\Node1\ChildNodes]
+Count=3
+
+[Project\ChildNodes]
+Count=2
+
+[Project\ExtraPythonPath]
+Count=0
+
