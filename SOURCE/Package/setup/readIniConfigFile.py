@@ -89,7 +89,6 @@ def readIniConfigFile(gv, iniFileName):
 
     if not os.path.isfile(gv.INI.RSYNC_PROGRAM):
         gv.INI.RSYNC_PROGRAM = LN.file.getFullPath(gv, gv.INI.RSYNC_PROGRAM, 'PATH', exitOnError=True)
-    print ".................sono qui", tempDir, gv.INI.TEMPDIR
 
     if not os.path.isfile(gv.INI.GREP_PROGRAM):
         gv.INI.GREP_PROGRAM  = LN.file.getFullPath(gv, gv.INI.GREP_PROGRAM,  'PATH', exitOnError=True)
