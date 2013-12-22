@@ -124,6 +124,9 @@ if __name__ == "__main__":
     gv.Prj      = Prj
     calledBy    = LN.sys.calledBy
 
+    logger      = gv.LN.logger          #  Ancora non lo abbiamo impostato
+    logger.setConsoleAnyway(False)
+
     # LN.dict.printDictionaryTree(gv, gv, header="Main variables [%s]" % calledBy(0), retCols='TV', lTAB=' '*4, console=True)
     # sys.exit()
 

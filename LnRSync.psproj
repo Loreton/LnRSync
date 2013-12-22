@@ -40,7 +40,7 @@ ClassName=TProjectRunConfiguationNode
 Name=run NO Section
 
 [Project\ChildNodes\Node1\ChildNodes\Node0\RunConfig]
-ScriptName=l:\Loreto\ProjectsAppl\_Python\LN_PythonProjects\LnRSync\SOURCE\__main__.py
+ScriptName=l:\Loreto\GIT-REPO-CLONE\LnRSync\SOURCE\__main__.py
 Description=Prova
 EngineType=peRemote
 ReinitializeBeforeRun=TRUE
@@ -64,7 +64,7 @@ ClassName=TProjectRunConfiguationNode
 Name=run with SectionName
 
 [Project\ChildNodes\Node1\ChildNodes\Node1\RunConfig]
-ScriptName=L:\Loreto\ProjectsAppl\PythonProjects\LnRSync\SOURCE\__main__.py
+ScriptName=l:\Loreto\GIT-REPO-CLONE\LnRSync\SOURCE\__main__.py
 EngineType=peRemote
 ReinitializeBeforeRun=TRUE
 Parameters=-c HomeBackup.cfg -a step -s Test_DiscoX

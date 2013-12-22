@@ -40,4 +40,6 @@ def initLog(gv):
     os.environ['LoggerID'] = log.loggerID # per gli altri moduli
     gv.LOG.logger          = logger
 
+    myLogger.setConsoleAnyway(False)              # flag to display error messages before logfile is opened
+
     return
