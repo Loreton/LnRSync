@@ -29,5 +29,5 @@ def exit(gv, rcode, text):
 
     print
 
-    logger.info('exiting - [called by:%s]' % (calledBy(1)))
+    logger.debug('exiting - [called by:%s]' % (calledBy(1)))
     sys.exit(rcode)

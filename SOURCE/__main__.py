@@ -8,7 +8,7 @@
 #     oppure creare un file che si chiama __main__.py e lanciare il comando:
 #        python JBossStart_LNf.zip [parameters]
 # ######################################################################################
-import sys, os
+import sys, os; sys.dont_write_bytecode = True
 import platform
 
 class myClass():    pass
