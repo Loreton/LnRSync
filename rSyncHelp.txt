@@ -140,4 +140,3 @@ Options
 Use "rsync --daemon --help" to see the daemon-mode command-line options.
 Please see the rsync(1) and rsyncd.conf(5) man pages for full documentation.
 See http://rsync.samba.org/ for updates, bug reports, and answers
-rsync error: syntax or usage error (code 1) at main.c(1408) [client=3.0.3]
