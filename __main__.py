@@ -22,76 +22,103 @@ def preparePATHs():
     mySep = '/'
 
     thisModuleDIR   = os.path.dirname(os.path.realpath(__file__))
+    print (thisModuleDIR)
     myPaths = []
 
     if thisModuleDIR.endswith('.zip'):
-        ZIP = True
+        EXTERNAL = False
+        myPaths.extend([
+            os.path.normpath('{0}'.format(thisModuleDIR) ) ,
+        ])
+    elif os.path.isdir(('lnfunctions')):
+        EXTERNAL = False
         myPaths.extend([
             os.path.normpath('{0}'.format(thisModuleDIR) ) ,
         ])
     else:
-        ZIP = False
+        EXTERNAL = True
         myPaths.extend([
             os.path.normpath('{0}'.format(thisModuleDIR) ) ,
             os.path.normpath('{0}'.format('../') ) ,    # Per cercare le LnFunctionsNew
         ])
 
     myPaths.reverse()
-    for path in myPaths: sys.path.insert(0, path)
+    for path in myPaths:
+        sys.path.insert(0, path)
+        print (path)
     os.environ['PYTHONPATH'] = os.pathsep.join(myPaths)
 
-    if ZIP:
-        import LnFunctions    as ln
-    else:
+    if EXTERNAL:
         import LnFunctionsNew as ln
+    else:
+        import LnFunctions    as ln
 
     return ln
 
 
 class LnClass(): pass
 
+
+# #############################################################################
+# # printLnClass()
+# #############################################################################
+def printLnClass(dictID, level=1):
+    dictID = vars(dictID)
+    for key, val in dictID.items():
+        if key.startswith('__') and key.endswith('__'): continue    # elimina tutti i built-in (presente in un modulo)
+        if isinstance(val, LnClass):
+            print()
+            print('[{}] {}{:<20} : {}'.format(level, ' '*level*4, key, "LnClass"))
+            printLnClass(val, level=level+1)
+        else:
+            print('[{}] {}{:<20} : {}'.format(level, ' '*level*4, key, val))
+
+
+# #############################################################################
+# # prepareServerPath()
+# #############################################################################
+def prepareServerPath(partner, subDir, hostSepCahr):
+    TYPE, SERVER, dirName = partner.split(hostSepCahr, 2)
+    baseDir   = dirName.strip()
+    hostName  = SERVER.strip()
+
+    if not subDir[-1] == '/': subDir += '/'
+    fullDir = "{}/{}".format(baseDir.strip(), subDir)
+
+        # convert to cygWin path (if required)
+    if fullDir[1] == ':' and not fullDir[0] == '/':
+        fullDir = '/cygdrive/' + fullDir[0] + fullDir[2:].replace('\\', '/')
+
+    if TYPE.strip() == 'SOURCE':
+        gv.SOURCE.HostName  = 'LOCAL' if hostName == 'LOCAL' else hostName
+        gv.SOURCE.PATH      = fullDir
+        if gv.OpSys.upper() == 'WINDOWS': gv.SOURCE.HostType = 'WINDOWS'
+    else:
+        gv.DEST.HostName    = 'LOCAL' if hostName == 'LOCAL' else hostName
+        gv.DEST.PATH        = fullDir
+        if gv.OpSys.upper() == 'WINDOWS': gv.DEST.HostType = 'WINDOWS'
+
+
+
+
 ################################################################################
 # - getSectionItem
 ################################################################################
-def getSectionItem(rSyncCMD, sourceBaseDir, destBaseDir, subDir, sourceHOST, destHOST):
-    # p = LnClass()
-    # p.sourceDir = []
-    # p.destDir = []
-    # p.rSyncOPT = []
+def prepareRsyncCommand(rSyncCMD, hostSepCahr, partner01, partner02, subDir):
+
+    prepareServerPath(partner01, subDir, hostSepCahr)
+    prepareServerPath(partner02, subDir, hostSepCahr)
     rsyncOPT = []
 
-    subDir = subDir.strip()
-    if not subDir: return []
-    if not subDir[-1] == '/': subDir += '/'
-    sourceDir = "{}/{}".format(sourceBaseDir.strip(), subDir)
-    destDir   = "{}/{}".format(destBaseDir.strip(), subDir)
-
-        # convert to cygWin path
-    sourceHOST = 'REMOTE'
-    if not sourceDir[0] == '/' and sourceDir[1] == ':':
-        sourceDir = '/cygdrive/' + sourceDir[0] + sourceDir[2:].replace('\\', '/')
-        sourceHOSTType = 'WINDOWS'
-        if gv.OpSys.upper() == 'WINDOWS':
-            sourceHOST = 'LOCAL'
-
-    destHOST = 'REMOTE'
-    if not destDir[0] == '/' and destDir[1] == ':':
-        destDir = '/cygdrive/' + destDir[0] + destDir[2:].replace('\\', '/')
-        destHOSTType = 'WINDOWS'
-        if gv.OpSys.upper() == 'WINDOWS':
-            destHOST = 'LOCAL'
-
-    XFER_TYPE = '{}_TO_{}'.format(sourceHOST, destHOST)
 
 
     # OPTIONS
-    for key, val in optionSECT.items():
-        key0, key1 = key.split('.')
-
-        if XFER_TYPE        == 'LOCAL_TO_LOCAL' and key1.startswith('LR_'): continue
-        if destHOSTType     == 'WINDOWS'        and key1.startswith('LINUX_'): continue
-        if not destHOSTType == 'WINDOWS'        and key1.startswith('WIN_'): continue
-        if key1 == 'EXCLUDE':
+    XFER_TYPE = '{}_TO_{}'.format(gv.SOURCE.HostName, gv.DEST.HostName)
+    for key, val in baseOptionSECT.items():
+        if XFER_TYPE        == 'LOCAL_TO_LOCAL' and key.startswith('TO_FROM_REM.'): continue
+        if gv.DEST.HostType == 'WINDOWS'        and key.startswith('LINUX.'): continue
+        if gv.DEST.HostType != 'WINDOWS'        and key.startswith('WIN.'): continue
+        if key.split('.')[-1] == 'EXCLUDE':
             for item in val.split():
                 # rsyncOPT.append('--exclude {}'.format(item))
                 rsyncOPT.append('--exclude')
@@ -102,27 +129,28 @@ def getSectionItem(rSyncCMD, sourceBaseDir, destBaseDir, subDir, sourceHOST, des
     rSyncCMD.extend(rsyncOPT)
 
 
-    if sourceHOST == 'LOCAL':
-        rSyncCMD.append('"{}"'.format(sourceDir))
+    if gv.SOURCE.HostName == 'LOCAL':
+        rSyncCMD.append('"{}"'.format(gv.SOURCE.PATH))
     else:
-        rSyncCMD.append('"{}{}"'.format(sourceHost, sourceDir))
+        rSyncCMD.append('"{}:{}"'.format(gv.SOURCE.HostName, gv.SOURCE.PATH))
 
-    if destHOST   == 'LOCAL':
-        rSyncCMD.append('"{}"'.format(destDir))
+    if gv.DEST.HostName   == 'LOCAL':
+        rSyncCMD.append('"{}"'.format(gv.DEST.PATH))
     else:
-        rSyncCMD.append('"{}{}"'.format(destHost, destDir))
+        rSyncCMD.append('"{}:{}"'.format(gv.DEST.HostName, gv.DEST.PATH))
 
 
     print ()
     print ('*'*50)
-    print ('*   XFER_TYPE:  {}_TO_{}'.format(sourceHOST, destHOST))
-    print ('*   sourceDir:  {}'.format(sourceDir))
-    print ('*   destDir:    {}'.format(destDir))
-    print (' '.join(rSyncCMD))
+    print ('*   XFER_TYPE:  {}_TO_{}'.format(gv.SOURCE.HostName, gv.DEST.HostName))
+    print ('*   sourceDir:  {}:{}'.format(gv.SOURCE.HostName, gv.SOURCE.PATH))
+    print ('*   destDir:    {}:{}'.format(gv.DEST.HostName, gv.DEST.PATH))
+    # print (' '.join(rSyncCMD))
     print ('*'*50)
     print ()
 
     return rSyncCMD
+
 
 
 ################################################################################
@@ -173,25 +201,13 @@ if __name__ == "__main__":
         pathSECT        = INI['PATH']
 
             # Options Section
-        optionSECT      = INI['OPTIONS_' + TYPE_OF_COMMAND]
+        baseOptionSECT      = INI['RSYNC_OPTIONS']
 
-            # Options Section
-        # dirsSECT      = INI['DIRECTORY']
-
-        dirsSECT      = INI[sectionName]
-        sourceHOST      = dirsSECT['sourceHOST']; del dirsSECT['sourceHOST']
-        destHOST        = dirsSECT['destHOST'];   del dirsSECT['destHOST']
-
-        # sourceHostType   = dirsSECT['sourceHOSTType']; del dirsSECT['sourceHOSTType']
-        # dstHostType     = dirsSECT['dstHOSTType']; del dirsSECT['dstHOSTType']
-
-        # XFR_TYPE      = dirsSECT['XFR_TYPE']
-        # sourceHost, toHost = dirsSECT['HOSTS'].split(',')
-        # del dirsSECT['XFR_TYPE']
+        workingSECT     = INI[sectionName]
+        hostSepCahr     = workingSECT['sepChar']; del workingSECT['sepChar']
 
             # Main Section
         mainSECT        = INI['MAIN']
-        # remoteHost      = mainSECT['REMOTE_HOST']
         RSYNC_Program   = mainSECT['RSYNC_Program']
 
     except (Exception) as why:
@@ -202,83 +218,54 @@ if __name__ == "__main__":
     for key, val in pathSECT.items():
         sys.path.insert(0, val.strip())
 
-    '''
-    rsyncOPT = []
-    if toHost.upper() == 'LOCAL'  and gv.OpSys.upper() == 'WINDOWS':
-    if toHost.upper() == 'LOCAL'  and gv.OpSys.upper() == 'WINDOWS':
-        for key, val in optionSECT.items():
-            key0, key1 = key.split('.')
-            if key1 in ['LINUX_SSH', 'LINUX_SUDO', 'COMPRESS', 'LINUX_CHMOD', 'ICONV']:
-                continue
-            rsyncOPT.append(val)
-
-
-    if toHost.upper() == 'REMOTE' and gv.OpSys.upper() == 'WINDOWS':
-
-
-    if sourceHost.upper() == 'LOCAL':
-
-
-    if TYPE_OF_COMMAND in ['OS_SYSTEM', 'CALL']:
-        for key, val in optionSECT.items():
-            if XFR_TYPE == 'LOCAL_TO_LOCAL':
-                key0, key1 = key.split('.')
-                if key1 in ['LINUX_SSH', 'LINUX_SUDO', 'COMPRESS', 'LINUX_CHMOD', 'ICONV']:
-                    continue
-            rsyncOPT.append(val)
-
-            # da testare
-    elif TYPE_OF_COMMAND == 'CHECK_OUTPUT':
-        for key, val in optionSECT.items():
-            lista = val.split('_,_ ')
-            for param in lista:
-                rsyncOPT.append(param.strip())
-
-
-    baseRSyncCMD = []
-    baseRSyncCMD.append(RSYNC_Program)
-    baseRSyncCMD.append(DRY_RUN)
-    baseRSyncCMD.extend(rsyncOPT)
-    # print (baseRSyncCMD)
-    # sys.exit()
-    if XFR_TYPE == 'LOCAL_TO_REMOTE':
-        remoteHost += ':'
-    else:
-        remoteHost = ''
-
-    '''
+        # - preparazione comando di base
     baseRSyncCMD = []
     baseRSyncCMD.append(RSYNC_Program)
     baseRSyncCMD.append(DRY_RUN)
 
-    for key, val in dirsSECT.items():
+
+
+    gv.SOURCE = LnClass()
+    gv.DEST   = LnClass()
+    # gv.SOURCE.Loreto = 'Ciao'
+    # gv.SOURCE.Loreto1 = 'Ciao1'
+
+        # - Elaborazione della section interessata.
+    for key, val in workingSECT.items():
         if key.startswith('var.'):  continue
         if key.startswith('x.'):    continue
 
+        partner01, partner02, rest = val.split(',', 2)
 
-        sourceBaseDir, destBaseDir, rest = val.split(',', 2)
 
         subDirs = rest.split(',')
         for subDir in subDirs:
+            subDir = subDir.strip()
             if not subDir: continue
-            rSyncCMD = getSectionItem(baseRSyncCMD[:], sourceBaseDir, destBaseDir, subDir, sourceHOST, destHOST)
+
+            rSyncCMD = prepareRsyncCommand(baseRSyncCMD[:], hostSepCahr, partner01, partner02, subDir)
+
+            # sys.exit()
             # print (rSyncCMD)
             # continue
+
 
             print('........... {} ...............'.format(TYPE_OF_COMMAND))
             if TYPE_OF_COMMAND == 'OS_SYSTEM':
                 print(' '.join(rSyncCMD))
-                rCode = os.system(' '.join(rSyncCMD))
-                print (rCode)
+                # rCode = os.system(' '.join(rSyncCMD))
+                # print (rCode)
 
             elif TYPE_OF_COMMAND == 'CALL':
                 print(' '.join(rSyncCMD))
-                rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
-                print (rCode)
+                # rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
+                # print (rCode)
 
             elif TYPE_OF_COMMAND == 'CHECK_OUTPUT':
                 res = subprocess.check_output(rSyncCMD, stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
                 res = res.decode('utf-8')                                           # converti in STRing
+
+
 
 
 
