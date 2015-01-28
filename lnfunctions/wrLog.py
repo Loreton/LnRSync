@@ -9,11 +9,11 @@ LOG = None
 # ##############################################################
 # #
 # ##############################################################
-def wrLog(data, fName=None, exit=False):
+def wrLog(data='', fName=None, quit=False):
     global LOG
     lineNO = sys._getframe( 1 ).f_lineno    # ottieni la riga del chiamante
 
-    if exit: data = data + ' [exiting]'
+    if quit: data = data + ' [exiting]'
 
     if (fName):
         try:
@@ -34,9 +34,11 @@ def wrLog(data, fName=None, exit=False):
     if gv.fSYSLOG:
         syslog.syslog(syslog.LOG_INFO, "Loreto - [{:<15}] - {}".format(gv.UUID, data))
 
-    if exit and LOG:
-        LOG.close()
+    if quit:
+        if LOG:
+            LOG.close()
         sys.exit()
 
+    return LOG
 
 

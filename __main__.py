@@ -113,27 +113,33 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
     sourcePATH   = "{}/{}".format(sourcePART[1].strip(), subDir)
     destPATH     = "{}/{}".format(destPART[1].strip(), subDir)
 
-    destHostType = ''
-    if gv.OpSys.upper() == 'WINDOWS' and destHostName == 'LOCAL': destHostType = 'WINDOWS'
 
         # -------------------------------------------
-        # convert to cygWin path (if required)
+        # - convert to cygWin path (if required)
         # -------------------------------------------
-    if sourcePATH[1] == ':' and not sourcePATH[0] == '/':
-        sourcePATH = '/cygdrive/' + sourcePATH[0] + sourcePATH[2:].replace('\\', '/')
-    if destPATH[1] == ':' and not destPATH[0] == '/':
-        destPATH = '/cygdrive/' + destPATH[0] + destPATH[2:].replace('\\', '/')
+    if sourceHostName == 'LOCAL' and gv.OpSys.upper() == 'WINDOWS':
+        if sourcePATH[1] == ':' and not sourcePATH[0] == '/':
+            sourcePATH = '/cygdrive/' + sourcePATH[0] + sourcePATH[2:].replace('\\', '/')
+
+    if destHostName == 'LOCAL' and gv.OpSys.upper() == 'WINDOWS':
+        destHostType = 'WINDOWS'
+        if destPATH[1] == ':' and not destPATH[0] == '/':
+            destPATH = '/cygdrive/' + destPATH[0] + destPATH[2:].replace('\\', '/')
+    else:
+        destHostType = ''
 
     rsyncOPT = []
 
         # -----------------------
         # - Load OPTIONS
         # -----------------------
+        inserrire il controllo sul primo qual. e lavorare con logina positia e non negativa
     XFER_TYPE = '{}_TO_{}'.format(sourceHostName, destHostName)
     for key, val in baseOptionSECT.items():
         if XFER_TYPE        == 'LOCAL_TO_LOCAL' and key.startswith('TO_FROM_REM.'): continue
         if destHostType     == 'WINDOWS'        and key.startswith('LINUX.'): continue
-        if destHostType     != 'WINDOWS'        and key.startswith('WIN.'): continue
+        if destHostType     != 'WINDOWS'        and key.startswith('WINDEST.'): continue
+        if sourceHostType   != 'WINDOWS'        and key.startswith('WINSOURCE.'): continue
         if key.split('.')[-1] == 'EXCLUDE':
             for item in val.split():
                 # rsyncOPT.append('--exclude {}'.format(item))
@@ -155,8 +161,7 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
     else:
         rSyncCMD.append('"{}:{}"'.format(destHostName, destPATH))
 
-
-    print ()
+    print ('\n'*3)
     print ('*'*50)
     print ('*   XFER_TYPE:  {}_TO_{}'.format(sourceHostName, destHostName))
     print ('*   sourcePATH:  {}:{}'.format(sourceHostName, sourcePATH))
@@ -165,9 +170,45 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
     print ('*'*50)
     print ()
 
+
     return rSyncCMD
 
+################################################################################
+# - printSections()
+################################################################################
+def printSections(INI):
+    print()
+    print('        SECTIONs disponibili nel file indicato.')
+    for section in INI.sections():
+        if not section in ['myVAR', 'PATH', 'MAIN', 'dirVARS', 'RSYNC_OPTIONS', ]:
+            print ('            {}'.format(section))
+    print ()
 
+
+
+te = open('log.txt','w')  # File where you need to keep the logs
+class Unbuffered:
+   def __init__(self, stream):
+       self.stream = stream
+
+   def write(self, data):
+       self.stream.write(data)
+       self.stream.flush()
+       te.write(data)    # Write the data of stdout here to a text file as well
+
+
+
+sys.stdout=Unbuffered(sys.stdout)
+'''
+class Logger(object):
+    def __init__(self, filename="Default.log"):
+        self.terminal = sys.stdout
+        self.log = open(filename, "a")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+'''
 
 ################################################################################
 # - M A I N
@@ -175,9 +216,7 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
 if __name__ == "__main__":
     ln = preparePATHs()
     gv = ln.gv              # shortLink
-    gv.fCONSOLE = False
-        # - Apertura LOG
-    ln.wrLog("Apertura - log:{}".format(gv.logFname), fName=gv.logFname)
+    gv.fCONSOLE = True
 
         # cerchiamo il parametro --GO  e lo togliamo dalla lista
     DRY_RUN = '--dry-run'
@@ -194,7 +233,8 @@ if __name__ == "__main__":
         #   Param2: Nome della section da lavorare nel file.ini
         #           se mancante allora la SECTION=dir
         # ==========================================================
-    if len(sys.argv) < 3:
+    # print(len(sys.argv))
+    if len(sys.argv) < 2 :
         print('''
         Immettere:
             file.ini:       nome del file di configurazione
@@ -202,15 +242,23 @@ if __name__ == "__main__":
             ''')
         sys.exit()
 
-    iniFileName = sys.argv[1]
-    sectionName = sys.argv[2]
+    if len(sys.argv) >= 2:
+        iniFileName = sys.argv[1]
+        INIcParse, INI = ln.readIniFile(iniFileName, RAW=False)
 
+    if len(sys.argv) < 3 :
+        print('  Immettere anche il none della SECTION.')
+        printSections(INIcParse)
+        sys.exit()
+
+    sectionName = sys.argv[2]
 
     TYPE_OF_COMMAND = 'OS_SYSTEM'
     TYPE_OF_COMMAND = 'CALL'
     # iniFileName     = 'Portit-Backup.ini'
-    INIcParse, INI = ln.readIniFile(iniFileName, RAW=False)
     # ln.printINIconfigparser(INIcParse)
+
+
 
     try:
             # Path Section
@@ -226,8 +274,14 @@ if __name__ == "__main__":
         RSYNC_Program   = mainSECT['RSYNC_Program']
         LOGDir          = mainSECT['LOGDir']
 
+    except (KeyError) as why:
+        print("Errore nella lettura della chiave: {}".format(str(why)))
+        printSections(INIcParse)
+        sys.exit(-1)
+
     except (Exception) as why:
-        print("Errore nella lettura del parametro: {}".format(str(why)))
+        print("Errore nella lettura del file: {} - {}".format(iniFileName, str(why)))
+        printSections(INIcParse)
         sys.exit(-1)
 
         # aggiungiamo i percorsi nelle PATH
@@ -240,6 +294,7 @@ if __name__ == "__main__":
     baseRSyncCMD.append(DRY_RUN)
 
         # - LOG File
+    LOG = None
     if 'LOGFile' in workingSECT:
         logFile = workingSECT['LOGFile'].strip('"').strip("'").strip()
         del workingSECT['LOGFile']
@@ -247,9 +302,15 @@ if __name__ == "__main__":
         elif logFile.lower() == 'true':         logFullName = os.path.join(LOGDir, sectionName) + '.log'
         else:                                   logFullName = os.path.join(LOGDir, logFile)
         if logFullName:
+            # gv.fCONSOLE = False
             if os.path.isfile(logFullName):
                 os.remove(logFullName)
-                baseRSyncCMD.append('--log-file={}'.format(logFullName))
+            baseRSyncCMD.append('--log-file={}'.format(logFullName))
+            # sys.stdout = open(logFullName, 'a')
+            # LOG = print("starting rSync for section:{0}".format(sectionName), fName=logFullName)
+            print('#'*80)
+            print('#'*80)
+
 
     # print (baseRSyncCMD); sys.exit()
 
@@ -258,7 +319,7 @@ if __name__ == "__main__":
     keyDONE = ['var', 'x']  # keyPrefix da saltare
     for key, val in workingSECT.items():
         key1, rest = key.split('.', 1)
-        if key1 in keyDONE: continue        # l'abbiamo già analizzata oppure è una var. o x.
+        if key1 in keyDONE: continue        # l'abbiamo gi�  analizzata oppure è una var. o x.
 
         sourcePART = workingSECT[key1 + '.SOURCE'].split(',')
         destPART   = workingSECT[key1 + '.DEST'].split(',')
@@ -272,7 +333,6 @@ if __name__ == "__main__":
 
             rSyncCMD = prepareRsyncCommand(baseRSyncCMD[:], sourcePART, destPART, subDir)
 
-
             print('........... {} ...............'.format(TYPE_OF_COMMAND))
             if TYPE_OF_COMMAND == 'OS_SYSTEM':
                 print(' '.join(rSyncCMD))
@@ -281,14 +341,22 @@ if __name__ == "__main__":
 
             elif TYPE_OF_COMMAND == 'CALL':
                 print(' '.join(rSyncCMD))
+                # outFile = open(logFullName, 'a')
                 rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
-                print (rCode)
+                # rCode = subprocess.call(' '.join(rSyncCMD), stdout=LOG, stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
+                print('-'*60)
+                print("process for subDir: {0} completed. [rCode={1}]".format(subDir, rCode))
+                print('-'*60)
+
+
 
             elif TYPE_OF_COMMAND == 'CHECK_OUTPUT':
                 res = subprocess.check_output(rSyncCMD, stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
                 res = res.decode('utf-8')                                           # converti in STRing
 
 
+    if logFullName:
+        print("process for sectionName: {0} completed.".format(sectionName), quit=True)
 
 
 

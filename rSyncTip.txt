@@ -1,0 +1,86 @@
+# >f.st......
+#   > - the item is received
+#   f - it is a regular file
+#   s - the file size is different
+#   t - the time stamp is different
+
+
+# .d..t......
+#   . - the item is not being updated (though it might have attributes that are being modified)
+#   d - it is a directory
+#   t - the time stamp is different
+
+# >f+++++++++
+#   > - the item is received
+#   f - a regular file
+#   +++++++++ - this is a newly created item
+
+
+
+# The first character indicates what is happening to the file:
+
+#   < means that a file is being transferred to the remote host (sent).
+#   > means that a file is being transferred to the local host (received).
+#   c means that a local change/creation is occurring for the item (such as the creation of a directory or the changing of a symlink, etc.).
+#   h means that the item is a hard link to another item (requires --hard-links).
+#   . means that the item is not being updated (though it might have attributes that are being modified).
+#   * means that the rest of the itemized-output area contains a message (e.g. "deleting").
+
+# The second character indicates what type of directory entry it is. Specifically:
+#   f for file
+#   d for directory
+#   L for symbolic link
+#   D for device
+#   S for special file (e.g. socket or fifo   )
+
+# The remaining columns are described below:
+#   c means either that a regular file has a different checksum or that a symlink, device, or special file has a changed value.
+#   s means the size of a regular file is different and will be updated by the file transfer.
+#   t or T:
+#       t means the modification time is different and is being updated to the sender's value
+#       T means that the modification time will be set to the transfer time
+#   p means the permissions are different and are being updated to the sender's value
+#   o means the owner is different and is being updated to the sender's value
+#   g means the group is different and is being updated to the sender's value
+#   . unused
+
+# The following columns may not be present, depending on your transfer options
+# a means that the ACL information changed
+# x means that the extended attribute information changed
+
+
+;       -a,     --archive           archive mode equals -rlptgoD (no -H,-A,-X)
+;       -r,     --recursive         recurse into directories
+;       -l,     --links             copy symlinks as symlinks
+;       -p,     --perms             preserve permissions
+;       -t,     --times             preserve modification times
+;       -g,     --group             preserve group
+;       -o,     --owner             preserve owner (super-user only)
+;       -D                          same as --devices --specials
+;               --devices           preserve device files (super-user only)
+;               --specials          preserve special files
+
+;       --no-OPTION                 turn off an implied OPTION (e.g. --no-D)
+;       -O,     --omit-dir-times    omit directories from --times
+;       -s,     --protect-args      no space-splitting; only wildcard special-chars
+;       -u,     --update            skip files that are newer on the receiver
+
+
+; The switches breakdown as follows:
+
+;   -avvz               = archive, verbose x 2, compress
+;   --times             = preserve modification times
+;   --stats             = give some file-transfer stats
+;   --checksum          = skip based on checksum, not mod-time & size
+;   --human-readable    = output numbers in a human-readable format
+;   --acls              = preserve ACLs (implies -p)
+;   --itemize-changes   = output a change-summary for all updates
+;   --progress          = show progress during transfer
+;   --out-format='[%t] [%i] (Last Modified: %M) (bytes: %-10l) %-100n'
+;       %t = current date time
+;       %i = an itemized list of what is being updated
+;       %M = the last-modified time of the file
+;       %-10l = the length of the file in bytes (-10 is for alignment and precision)
+;       %-100n = the filename (short form; trailing "/" on dir) (-100 is for alignment and precision)
+
+
