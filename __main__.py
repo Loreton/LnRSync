@@ -117,35 +117,41 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
         # -------------------------------------------
         # - convert to cygWin path (if required)
         # -------------------------------------------
+    sourceTYPE = 'UNIX_SOURCE'
+
     if sourceHostName == 'LOCAL' and gv.OpSys.upper() == 'WINDOWS':
+        sourceTYPE = 'WIN_SOURCE'
         if sourcePATH[1] == ':' and not sourcePATH[0] == '/':
             sourcePATH = '/cygdrive/' + sourcePATH[0] + sourcePATH[2:].replace('\\', '/')
 
+    destTYPE = 'UNIX_DEST'
     if destHostName == 'LOCAL' and gv.OpSys.upper() == 'WINDOWS':
-        destHostType = 'WINDOWS'
+        destTYPE = 'WIN_DEST'
         if destPATH[1] == ':' and not destPATH[0] == '/':
             destPATH = '/cygdrive/' + destPATH[0] + destPATH[2:].replace('\\', '/')
-    else:
-        destHostType = ''
 
     rsyncOPT = []
 
         # -----------------------
         # - Load OPTIONS
         # -----------------------
-        inserrire il controllo sul primo qual. e lavorare con logina positia e non negativa
-    XFER_TYPE = '{}_TO_{}'.format(sourceHostName, destHostName)
+    XFER_TYPE = 'LOC_TO_LOC' if sourceTYPE.split('_')[0] == destTYPE.split('_')[0] else 'ONE_IS_REMOTE'
+
     for key, val in baseOptionSECT.items():
-        if XFER_TYPE        == 'LOCAL_TO_LOCAL' and key.startswith('TO_FROM_REM.'): continue
-        if destHostType     == 'WINDOWS'        and key.startswith('LINUX.'): continue
-        if destHostType     != 'WINDOWS'        and key.startswith('WINDEST.'): continue
-        if sourceHostType   != 'WINDOWS'        and key.startswith('WINSOURCE.'): continue
-        if key.split('.')[-1] == 'EXCLUDE':
+        token = key.split('.'); keyPrefix = token[0]; keySuffix = token[-1]
+
+        if keySuffix == 'EXCLUDE':
             for item in val.split():
-                # rsyncOPT.append('--exclude {}'.format(item))
                 rsyncOPT.append('--exclude')
                 rsyncOPT.append(item)
-        else:
+            continue
+
+        ADD = False
+        if   keyPrefix == 'BASE':       ADD = True
+        elif keyPrefix == sourceTYPE:   ADD = True
+        elif keyPrefix == destTYPE:     ADD = True
+        elif keyPrefix == XFER_TYPE:    ADD = True
+        if ADD:
             rsyncOPT.append(val)
 
     rSyncCMD.extend(rsyncOPT)
@@ -185,30 +191,6 @@ def printSections(INI):
     print ()
 
 
-
-te = open('log.txt','w')  # File where you need to keep the logs
-class Unbuffered:
-   def __init__(self, stream):
-       self.stream = stream
-
-   def write(self, data):
-       self.stream.write(data)
-       self.stream.flush()
-       te.write(data)    # Write the data of stdout here to a text file as well
-
-
-
-sys.stdout=Unbuffered(sys.stdout)
-'''
-class Logger(object):
-    def __init__(self, filename="Default.log"):
-        self.terminal = sys.stdout
-        self.log = open(filename, "a")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-'''
 
 ################################################################################
 # - M A I N
@@ -341,12 +323,10 @@ if __name__ == "__main__":
 
             elif TYPE_OF_COMMAND == 'CALL':
                 print(' '.join(rSyncCMD))
-                # outFile = open(logFullName, 'a')
-                rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
-                # rCode = subprocess.call(' '.join(rSyncCMD), stdout=LOG, stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
-                print('-'*60)
-                print("process for subDir: {0} completed. [rCode={1}]".format(subDir, rCode))
-                print('-'*60)
+                # rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
+                # print('-'*60)
+                # print("process for subDir: {0} completed. [rCode={1}]".format(subDir, rCode))
+                # print('-'*60)
 
 
 

@@ -1,38 +1,29 @@
 [myVAR]
-    MyKey                       = /cygdrive/c/Users/f602250/.ssh/id_rsa
-    LnFreeDir                   = E:\LnDisk\LnFree
-    LnPI.User                   = pi
-    ; LnPI.Host                 = 192.168.0.22
-    ; LnPI.port                 = 22
-    LnPI.Host                   = localhost
-    LnPI.port                   = 60022
-    winTempDIR                  = /cygdrive/d/zTemp/rSync
-    unixTempDIR                 = /tmp
+    MyKey                   = /cygdrive/c/Users/f602250/.ssh/id_rsa
+    LnFreeDir               = E:\LnDisk\LnFree
+    winTempDIR              = D:\zTemp\rSync
+    tempDIR                 = /tmp
 
 [RSYNC_OPTIONS]
     BASE.001.ARCHIVE            = --recursive --links --perms --times --group --owner --devices --specials
     BASE.002.Options            = --verbose --progress --update --protect-args --human-readable --stats
+    ; BASE.004.DEBUG              = -vv --info=progress2
     BASE.003.EXCLUDE            = *.log.* /Thumbs.db */cache/* Cache/ */log/*
     BASE.004.DELETE             = --delete-excluded --delete-after
     BASE.004.OUTFORMAT          = --out-format='[%t] [%i] (LastMod: %M) (bytes: %-10l) %-100n'
     BASE.004.LOG_FORMAT         = --log-file-format='[%t] [%i] LastMod: %M bytes: %-10l %-100n'
-    ; BASE.004.DEBUG              = -vv --info=progress2
 
-    ONE_IS_REMOTE.001.COMPRESS         = --compress
-    ONE_IS_REMOTE.002.ICONV            = --iconv=ISO-8859-1,utf-8
-    ; ONE_IS_REMOTE.002.ICONV            = --block-size????
-    ONE_IS_REMOTE.005.RSYNC_PARTIAL    = --partial --partial-dir=/cygdrive/d/zTemp/rSync
+    TO_FROM_REM.001.COMPRESS    = --compress
+    TO_FROM_REM.002.ICONV       = --iconv=ISO-8859-1,utf-8
+    TO_FROM_REM.002.ICONV       = --block-size????
 
-    UNIX_SOURCE.002.SSH         = -e "ssh -p ${myVAR:LnPI.port} -l ${myVAR:LnPI.User} -i "${myVAR:MyKey}""
-    UNIX_DEST.002.SSH           = -e "ssh -p ${myVAR:LnPI.port} -l ${myVAR:LnPI.User} -i "${myVAR:MyKey}""
+    LINUX.001.CHMOD             = --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r
+    LINUX.002.SSH               = -e "ssh -p 60022 -l pi -i "${myVAR:MyKey}""
+    LINUX.003.SUDO              = --rsync-path="sudo rsync"
 
-    UNIX_DEST.001.CHMOD         = --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r
-    UNIX_DEST.003.SUDO          = --rsync-path="sudo rsync"
+    WINDEST.001.CHMOD           = --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r
 
-    WIN_DEST.001.CHMOD           = --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r
-
-    WIN_SOURCE.001.PARTIAL       = --partial --partial-dir="${myVAR:winTempDIR}"
-    UNIX_SOURCE.001.PARTIAL      = --partial --partial-dir="${myVAR:unixTempDIR}"
+    WINSOURCE.001.PARTIAL       = --partial --partial-dir="${myVAR:winTempDIR}"
     ; LINUX.001.PARTIAL            = --partial --partial-dir="${myVAR:tempDIR}"
     ; WIN.001.CHMOD               = --perms --chmod=D2775,F664         ;http://serverfault.com/questions/233567/how-to-set-file-folder-permissions-using-rsync-from-windows-to-linux
 
@@ -92,47 +83,21 @@
     var.DestMP              =   /mnt/Lacie232GB_B/Papusso
 
     BdI.SOURCE              =   LOCAL,          d:\Dati\Profili\f602250
-    BdI.DEST              =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/BdI
+    BdI.DEST                =   pi@localhost,   ${var.DestMP}/BdI
     BdI.SubDirs             =   ${dirVARS:BdI}
 
     LnDisk.SOURCE         =   LOCAL,          e:\LnDisk
-    LnDisk.DEST           =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/LnDisk
+    LnDisk.DEST           =   pi@localhost,   ${var.DestMP}/LnDisk
     LnDisk.SubDirs        =   ${dirVARS:LnDisk}
 
 
     MyOtherData.SOURCE    =   LOCAL,          d:\Dati\Profili\f602250\LnFolder\MyOtherData
-    MyOtherData.DEST      =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/MyOtherData
+    MyOtherData.DEST      =   pi@localhost,   ${var.DestMP}/MyOtherData
     MyOtherData.SubDirs   =   ${dirVARS:MyOtherData}
 
 
     MyData.SOURCE         =   LOCAL,          d:\Dati\Profili\f602250\LnFolder\MyData
-    MyData.DEST           =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/MyData
-    MyData.SubDirs        =   ${dirVARS:MyData}
-
-
-# mettere una x. oppure var. davanti alla Key per escludere l'item
-[RaspBerryToWin]
-    LOGFile                 =
-
-    ; var.SourceMP        =   G:\Papusso
-    var.DestMP              =   /mnt/Lacie232GB_B/Papusso
-
-    BdI.SOURCE              =   LOCAL,          d:\Dati\Profili\f602250
-    BdI.DEST                =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/BdI
-    BdI.SubDirs             =   ${dirVARS:BdI}
-
-    LnDisk.DEST             =   LOCAL,          e:\LnDisk
-    LnDisk.SOURCE           =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/LnDisk
-    LnDisk.SubDirs          =   ${dirVARS:LnDisk}
-
-
-    MyOtherData.DEST        =   LOCAL,          d:\Dati\Profili\f602250\LnFolder\MyOtherData
-    MyOtherData.SOURCE      =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/MyOtherData
-    MyOtherData.SubDirs     =   ${dirVARS:MyOtherData}
-
-
-    MyData.DEST             =   LOCAL,          d:\Dati\Profili\f602250\LnFolder\MyData
-    MyData.SOURCE           =   ${myVAR:LnPI.User}@${myVAR:LnPI.Host},   ${var.DestMP}/MyData
+    MyData.DEST           =   pi@localhost,   ${var.DestMP}/MyData
     MyData.SubDirs        =   ${dirVARS:MyData}
 
 

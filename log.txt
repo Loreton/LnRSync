@@ -1,27 +1,8 @@
+Errore nella lettura della chiave: 'RSYNC_OPTIONS'
 
+        SECTIONs disponibili nel file indicato.
+            RSYNC_BASE
+            WinToRaspBerry
+            WinToHD
+            frompi
 
-
-
-**************************************************
-*   XFER_TYPE:  LOCAL_TO_LOCAL
-*   sourcePATH:  LOCAL:/cygdrive/d/Dati/Profili/f602250/Contacts/
-*   destPATH:    LOCAL:/cygdrive/G/Papusso/BdI/Contacts/
-**************************************************
-
-........... CALL ...............
-rsync.exe --dry-run --recursive --links --perms --times --group --owner --devices --specials --verbose --progress --update --protect-args --human-readable --stats --exclude *.log.* --exclude /Thumbs.db --exclude */cache/* --exclude Cache/ --exclude */log/* --delete-excluded --delete-after --out-format='[%t] [%i] (LastMod: %M) (bytes: %-10l) %-100n' --log-file-format='[%t] [%i] LastMod: %M bytes: %-10l %-100n' --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r "/cygdrive/d/Dati/Profili/f602250/Contacts/" "/cygdrive/G/Papusso/BdI/Contacts/"
-------------------------------------------------------------
-process for subDir: Contacts completed. [rCode=0]
-------------------------------------------------------------
-
-
-
-
-**************************************************
-*   XFER_TYPE:  LOCAL_TO_LOCAL
-*   sourcePATH:  LOCAL:/cygdrive/d/Dati/Profili/f602250/Documents/
-*   destPATH:    LOCAL:/cygdrive/G/Papusso/BdI/Documents/
-**************************************************
-
-........... CALL ...............
-rsync.exe --dry-run --recursive --links --perms --times --group --owner --devices --specials --verbose --progress --update --protect-args --human-readable --stats --exclude *.log.* --exclude /Thumbs.db --exclude */cache/* --exclude Cache/ --exclude */log/* --delete-excluded --delete-after --out-format='[%t] [%i] (LastMod: %M) (bytes: %-10l) %-100n' --log-file-format='[%t] [%i] LastMod: %M bytes: %-10l %-100n' --perms --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r "/cygdrive/d/Dati/Profili/f602250/Documents/" "/cygdrive/G/Papusso/BdI/Documents/"
