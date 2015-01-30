@@ -142,8 +142,8 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
 
         if keySuffix == 'EXCLUDE':
             for item in val.split():
-                rsyncOPT.append('--exclude')
-                rsyncOPT.append(item)
+                rsyncOPT.append('--exclude="{}"'.format(item))
+                # rsyncOPT.append(item)
             continue
 
         ADD = False
@@ -323,10 +323,10 @@ if __name__ == "__main__":
 
             elif TYPE_OF_COMMAND == 'CALL':
                 print(' '.join(rSyncCMD))
-                # rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
-                # print('-'*60)
-                # print("process for subDir: {0} completed. [rCode={1}]".format(subDir, rCode))
-                # print('-'*60)
+                rCode = subprocess.call(' '.join(rSyncCMD), stderr=subprocess.STDOUT)  # ritorna <class 'bytes'>
+                print('-'*60)
+                print("process for subDir: {0} completed. [rCode={1}]".format(subDir, rCode))
+                print('-'*60)
 
 
 

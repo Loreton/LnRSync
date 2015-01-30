@@ -1,8 +1,0 @@
-Errore nella lettura della chiave: 'RSYNC_OPTIONS'
-
-        SECTIONs disponibili nel file indicato.
-            RSYNC_BASE
-            WinToRaspBerry
-            WinToHD
-            frompi
-
