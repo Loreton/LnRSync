@@ -1,19 +1,19 @@
 #!/usr/bin/python3
-
 import sys, os
 
 from . GlobalVars import GlobalVars as gv
+
 
 LOG = None
 
 # ##############################################################
 # #
 # ##############################################################
-def wrLog(data='', fName=None, quit=False):
+def wrLog(data='', fName=None, exitCode=None):
     global LOG
     lineNO = sys._getframe( 1 ).f_lineno    # ottieni la riga del chiamante
 
-    if quit: data = data + ' [exiting]'
+    if exitCode: data = data + ' [exiting]'
 
     if (fName):
         try:
@@ -34,11 +34,9 @@ def wrLog(data='', fName=None, quit=False):
     if gv.fSYSLOG:
         syslog.syslog(syslog.LOG_INFO, "Loreto - [{:<15}] - {}".format(gv.UUID, data))
 
-    if quit:
+    if exitCode:
         if LOG:
             LOG.close()
-        sys.exit()
+        sys.exit(exitCode)
 
     return LOG
-
-
