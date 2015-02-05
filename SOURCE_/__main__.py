@@ -133,17 +133,18 @@ def printSections(INI):
 # - inseriamo la lista delle dir dove possiamo trovare le LnFunctions
 # - vale anche per quando siamo all'interno del .zip
 ################################################################################
-def preparePATHs(zipFile, fDEBUG):
+def preparePATHs(fDEBUG):
     thisModuleDIR   = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-    print (thisModuleDIR)
+    # print (thisModuleDIR)
     if thisModuleDIR.endswith('.zip'):
-        LnFunctionsPath = [ zipFile,  '../', '../../', '../../../' ]
+        myPaths = [ '.', '../', '../../', '../../../' ]
 
     else:
-        LnFunctionsPath = [ '.', '../', '../../',  ]
+        myPaths = [ '.', '../', '../../',  ]
 
-    LnFunctionsPath.reverse()
-    for path in LnFunctionsPath:
+    myPaths.reverse()
+    if fDEBUG: print ("...... l'ordine va letto dal basso verso l'alto")
+    for path in myPaths:
         path = os.path.abspath(os.path.join(thisModuleDIR, path))
         if fDEBUG: print ('......', path)
         sys.path.insert(0, path)
@@ -155,7 +156,7 @@ def preparePATHs(zipFile, fDEBUG):
 # - M A I N
 ################################################################################
 if __name__ == "__main__":
-    ln = preparePATHs(zipFile='LnRSync.zip', fDEBUG=True)
+    ln = preparePATHs(fDEBUG=False)
     gv = ln.gv              # shortLink
     gv.fCONSOLE = True
 
