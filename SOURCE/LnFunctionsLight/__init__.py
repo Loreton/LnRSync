@@ -18,13 +18,14 @@ if OpSys == 'Windows':
     pass
 
 elif OpSys == 'Linux':
-    from . Linix.getBlockID         import getBlockID
-    from . Linix.getDevice          import getDevice
-    from . Linix.getDF              import getDF
-    from . Linix.getMountedFS       import getMountedFS
-    from . Linix.MountDevice        import MountDevice
-    from . Linix.Mountpoint         import Mountpoint
-    from . Linix.uMountDevice       import uMountDevice
+    from . Linux.getBlockID         import getBlockID
+    from . Linux.getDevice          import getDevice
+    from . Linux.getDF              import getDF
+    from . Linux.getMountedFS       import getMountedFS
+    from . Linux.MountDevice        import MountDevice
+    from . Linux.Mountpoint         import createMountpoint
+    from . Linux.Mountpoint         import removeMountPoint
+    from . Linux.uMountDevice       import uMountDevice
 
 
 
