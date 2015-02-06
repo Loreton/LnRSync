@@ -8,8 +8,10 @@
     set "thisPATH=%~dp0"
     cd /D %thisPATH%..\
 
+    set "PRGTYPE=ZIP"
     SET "MAINPRG=SOURCE\__main__.py"
-    IF NOT EXIST "%MAINPRG%" SET "MAINPRG=bin\LnRSync.zip"
+    IF "%PRGTYPE%" == "ZIP" SET "MAINPRG=bin\LnRSync.zip"
+
 
 
 :Execute
