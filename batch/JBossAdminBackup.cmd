@@ -31,10 +31,6 @@
     python %mainProgram% %confDIR%\%iniFile% %Project% %PARAMS% --GO
     goto :END
 
-:DEBUG
-    start python -c "import winpdb;winpdb.main()" %mainProgram% %PARAMS%
-    goto :END
-
 
 :END
     endlocal

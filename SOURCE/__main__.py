@@ -36,12 +36,17 @@ def prepareServerPath(partner, subDir):
         if gv.OpSys.upper() == 'WINDOWS': gv.DEST.HostType = 'WINDOWS'
 
 
+def addEXCLUDE(line):
+    lista = []
+    for item in line.split():
+        lista.append('--exclude="{}"'.format(item))
+    return lista
 
 
 ################################################################################
 # - getSectionItem
 ################################################################################
-def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
+def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir, extraOptions):
 
     sourceHostName  = sourcePART[0].strip()
     destHostName    = destPART[0].strip()
@@ -80,7 +85,6 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
         if keySuffix == 'EXCLUDE':
             for item in val.split():
                 rsyncOPT.append('--exclude="{}"'.format(item))
-                # rsyncOPT.append(item)
             continue
 
         ADD = False
@@ -90,8 +94,12 @@ def prepareRsyncCommand(rSyncCMD, sourcePART, destPART, subDir):
         elif keyPrefix == XFER_TYPE:    ADD = True
         if ADD:
             rsyncOPT.append(val)
+    # print (rsyncOPT)
+    rsyncOPT.extend(extraOptions)
+    # print (rsyncOPT)
 
     rSyncCMD.extend(rsyncOPT)
+
 
 
     if sourceHostName == 'LOCAL':
@@ -257,26 +265,43 @@ if __name__ == "__main__":
             print('#'*80)
 
 
-    # print (baseRSyncCMD); sys.exit()
 
 
         # - Elaborazione della section interessata.
     keyDONE = ['var', 'x']  # keyPrefix da saltare
     for key, val in workingSECT.items():
         key1, rest = key.split('.', 1)
-        if key1 in keyDONE: continue        # l'abbiamo gi√  analizzata oppure √® una var. o x.
-
+        if key1 in keyDONE: continue        # l'abbiamo gia' analizzata oppure e' una var. o x.
+        extraOptions = []
         sourcePART = workingSECT[key1 + '.SOURCE'].split(',')
         destPART   = workingSECT[key1 + '.DEST'].split(',')
         subDirs    = workingSECT[key1 + '.SubDirs'].split(',')
+
+        optKEY = key1 + '.OPT.EXCLUDE'
+        if optKEY in workingSECT:
+            excl = workingSECT[optKEY].split()
+            for item in excl:
+                extraOptions.append('--exclude="{}"'.format(item))
+        else:
+            print (optKEY  + '  - NOT FOUND')
+
+        optKEY = key1 + '.OPT.EXTRA'
+        if optKEY in workingSECT:
+            extraOptions.append(workingSECT[optKEY])
+        else:
+            print (optKEY  + '  - NOT FOUND')
+
+        # print (extraOptions)
+        # print ()
+
         keyDONE.append(key1)
-        # print(subDirs)
-        # continue
+
         for subDir in subDirs:
             subDir = subDir.strip()
             if not subDir: continue
 
-            rSyncCMD = prepareRsyncCommand(baseRSyncCMD[:], sourcePART, destPART, subDir)
+            rSyncCMD = prepareRsyncCommand(baseRSyncCMD[:], sourcePART, destPART, subDir, extraOptions)
+            # print (rSyncCMD); sys.exit()
 
             print('........... {} ...............'.format(TYPE_OF_COMMAND))
             if TYPE_OF_COMMAND == 'OS_SYSTEM':

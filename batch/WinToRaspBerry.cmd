@@ -17,7 +17,7 @@
     echo *******************************
     echo *  %MAINPRG%  *
     echo *******************************
-    call %pp%                               &:: call Python setup
+    call %pp% 3.2                              &:: call Python setup
     python %MAINPRG% ..\conf\LnRsync.ini %Project% --go
 
 :END
