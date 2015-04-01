@@ -35,7 +35,7 @@
     Caption="Esecuzione: $Project"
     echo $Caption
 
-    CMD="python3 $mainProgram $confDir/PI_DiskToDisk.ini $Project --go"
+    CMD="python3 $mainProgram $confDir/LnRSync.ini $Project --go"
     echo $CMD
 
     $CMD
