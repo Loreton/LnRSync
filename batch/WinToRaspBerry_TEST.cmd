@@ -4,14 +4,13 @@
     SET Caption="Esecuzione: %Project%"
     echo %Caption%
     TITLE "%Caption%"
-    CALL %Ln.FreeDir%\PythonPATH.cmd
 
     set "thisPATH=%~dp0"
     cd /D %thisPATH%..\
 
     set "PRGTYPE=ZIP"
     SET "MAINPRG=SOURCE\__main__.py"
-    IF "%PRGTYPE%" == "ZIP" SET "MAINPRG=bin\LnRSync.zip"
+    :: IF "%PRGTYPE%" == "ZIP" SET "MAINPRG=bin\LnRSync.zip"
 
 
 :Execute
@@ -19,7 +18,7 @@
     echo *  %MAINPRG%  *
     echo *******************************
     call %pp% 3.2                              &:: call Python setup
-    python %MAINPRG% ..\conf\LnRsync.ini %Project% --go
+    python %MAINPRG% ..\conf\LnRsync.ini %Project% --gos
 
 :END
     endlocal

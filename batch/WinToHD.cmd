@@ -1,12 +1,12 @@
 @ECHO OFF
     setlocal
         :: impostazione nome progetto
-    SET     "Project=%~n0"
-    SET     "iniFile=LnRSync.ini"
-    SET     Caption="Esecuzione: %Project%"
-    echo    %Caption%
-    TITLE   "%Caption%"
-    SET     PARAMS=%*
+    SET   "Project=%~n0"
+    SET   "iniFile=LnRSync.ini"
+    SET   Caption="Esecuzione: %Project%"
+    echo  %Caption%
+    TITLE "%Caption%"
+    SET   PARAMS=%*
 
 
         :: prelievo path corrente ed impostazione path vari

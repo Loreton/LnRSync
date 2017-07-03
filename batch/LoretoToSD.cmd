@@ -1,10 +1,9 @@
 @ECHO OFF
     setlocal
-    SET "Project=WinToRaspBerry"
+    SET "Project=LoretoToSD"
     SET Caption="Esecuzione: %Project%"
     echo %Caption%
     TITLE "%Caption%"
-    CALL %Ln.FreeDir%\PythonPATH.cmd
 
     set "thisPATH=%~dp0"
     cd /D %thisPATH%..\
@@ -13,13 +12,15 @@
     SET "MAINPRG=SOURCE\__main__.py"
     IF "%PRGTYPE%" == "ZIP" SET "MAINPRG=bin\LnRSync.zip"
 
+    set "Ln.FreeDir="
+    :: call %~d0\LnPortablePaths.cmd
 
 :Execute
     echo *******************************
     echo *  %MAINPRG%  *
     echo *******************************
-    call %pp% 3.2                              &:: call Python setup
-    python %MAINPRG% ..\conf\LnRsync.ini %Project% --go
+    :: call %pp% 3.2                               &:: call Python setup
+    python %MAINPRG% ..\conf\LnRSync.ini %Project% --gos
 
 :END
     endlocal
