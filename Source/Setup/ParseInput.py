@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 __author__  = 'Loreto Notarantonio'
-__version__ = 'LnVer_2017-07-03_11.12.07'
+__version__ = 'LnVer_2017-07-04_15.50.27'
 
 import sys
 import os
@@ -335,11 +335,11 @@ def _debugOptions(myParser, required=False):
 def SHARED_COMMAND(myParser, action):
     from . import ParseInput_Rsync as connect
 
-    if len(sys.argv) <= posizARGS+1: sys.argv.append('-h')
+    if len(sys.argv) <= posizARGS: sys.argv.append('-h')
 
     connect.SetGlobals(cPrint)
     connect.ExecuteOptions(myParser, required=False)
-    connect.DestServer(myParser, required=True)
+    # connect.DestServer(myParser, required=True)
 
     _debugOptions(myParser)
 
@@ -347,11 +347,7 @@ def SHARED_COMMAND(myParser, action):
 def LNDISK(myParser, action):
     SHARED_COMMAND(myParser, action)
 
-def SSH(myParser, action):
-    SHARED_COMMAND(myParser, action)
 
-def GUI(myParser, action):
-    SHARED_COMMAND(myParser, action)
 
 
 

@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 #
 # Scope:  ............
-# by Loreto Notarantonio LnVer_2017-07-03_18.33.06
+# by Loreto Notarantonio LnVer_2017-07-04_14.16.11
 # ######################################################################################
 import sys
 import os
@@ -53,31 +53,30 @@ def PrepareRsyncCommand(gv, rSyncCMD, sPartner, dPartner, subDir, extraOptions):
     XFER_TYPE = 'LOC_TO_LOC' if sourceTYPE.split('_')[0] == destTYPE.split('_')[0] else 'ONE_IS_REMOTE'
 
 
-    rsyncOPT_TYPE = 2
+    # splitRsyncOptions = True
+    # if splitRsyncOptions:
+    rsyncOPT = []
+    for key, val in gv.ini.RSYNC_OPTIONS.items():
+        token = key.split('.'); keyPrefix = token[0]; keySuffix = token[-1]
 
-    if rsyncOPT_TYPE == 1:
-        rsyncOPT = []
-        for key, val in gv.ini.RSYNC_OPTIONS.items():
-            token = key.split('.'); keyPrefix = token[0]; keySuffix = token[-1]
+        ADD = False
+        if   keyPrefix == 'BASE':       ADD = True
+        elif keyPrefix == sourceTYPE:   ADD = True
+        elif keyPrefix == destTYPE:     ADD = True
+        elif keyPrefix == XFER_TYPE:    ADD = True
+        if ADD:
+            if keySuffix == 'EXCLUDE':
+                for item in val.split():
+                    rsyncOPT.append('--exclude="{}"'.format(item))
+                continue
 
-            ADD = False
-            if   keyPrefix == 'BASE':       ADD = True
-            elif keyPrefix == sourceTYPE:   ADD = True
-            elif keyPrefix == destTYPE:     ADD = True
-            elif keyPrefix == XFER_TYPE:    ADD = True
-            if ADD:
-                if keySuffix == 'EXCLUDE':
-                    for item in val.split():
-                        rsyncOPT.append('--exclude="{}"'.format(item))
-                    continue
+            else:
+                for item in val.split('--'):
+                    if item.strip():
+                        rsyncOPT.append('--{}'.format(item.strip()))
 
-                else:
-                    for item in val.split('--'):
-                        if item.strip():
-                            rsyncOPT.append('--{}'.format(item.strip()))
-
-        print ('....1111', rsyncOPT)
-
+    '''
+        # print ('....1111\n', rsyncOPT)
     else:
         rsyncOPT = []
         for key, val in gv.ini.RSYNC_OPTIONS.items():
@@ -96,7 +95,8 @@ def PrepareRsyncCommand(gv, rSyncCMD, sPartner, dPartner, subDir, extraOptions):
             if ADD:
                 rsyncOPT.append(val)
 
-        print ('....2222', rsyncOPT)
+        # print ('....2222', rsyncOPT)
+    '''
 
     rsyncOPT.extend(extraOptions)
 
@@ -119,9 +119,7 @@ def PrepareRsyncCommand(gv, rSyncCMD, sPartner, dPartner, subDir, extraOptions):
     cPrint.Cyan ('*   sourcePATH:  {}:{}'.format(sourceHostName, sourcePATH), tab=4)
     cPrint.Cyan ('*   destPATH:    {}:{}'.format(destHostName, destPATH), tab=4)
     cPrint.Cyan ('*'*50, tab=4)
-    # for item in rSyncCMD:
-    #     cPrint.Yellow(item, tab=4)
-    # print()
+
     print ()
 
     myCommand = gv.Ln.LnDict()

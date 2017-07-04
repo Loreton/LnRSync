@@ -30,7 +30,7 @@ def ExecuteOptions(myParser, required=False):
 def DestServer(myParser, required):
     mandatory = cPrint.getMagentaH('MANDATORY - ') if required else 'OPTIONAL - '
 
-    myParser.add_argument( "-fs", "--from-server",
+    myParser.add_argument( "-from", "--from-server",
                             type=str,
                             required=required,
                             dest="fromServer",
@@ -39,7 +39,7 @@ def DestServer(myParser, required):
     [DEFAULT: None]
     """))
 
-    myParser.add_argument( "-ts", "--to-server",
+    myParser.add_argument( "-to", "--to-server",
                             type=str,
                             required=required,
                             dest="toServer",
